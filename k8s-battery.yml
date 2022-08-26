@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: battery
+  namespace: battery
+  labels:
+    app: battery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: battery
+  template:
+    metadata:
+      labels:
+        app: battery
+    spec:
+      nodeName: modulo-0
+      containers:
+      - name: battery
+        image: 192.168.1.100:30001/battery
+        port:
+        - containerPort: 5000
+        - containerPort: 9090
+        volumeMounts:
+        - mountPath: /dev/CP2102
+          name: dev-cp2102
+        securityContext:
+          privileged: true
+      securityContext:
+        supplementalGroups:
+        - 20
+      volumes:
+      - name: dev-cp2102
+        hostPath:
+          path: /dev/CP2102
+
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: battery
+#   labels:
+#     app: battery
+# spec:
+#   nodeName: modulo-0
+#   containers:
+#   - name: battery
+#     image: 192.168.1.100:30001/battery
+#     ports:
+#     - containerPort: 5000
+#     - containerPort: 9090
+#     volumeMounts:
+#     - mountPath: /dev/ttyUSB0
+#       name: dev-ttyusb0
+#     securityContext:
+#       privileged: true
+#   securityContext:
+#     supplementalGroups:
+#     - 20
+#   volumes:
+#   - name: dev-ttyusb0
+#     hostPath:
+#       path: /dev/ttyUSB0
+
+    
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: battery
+spec:
+  type: LoadBalancer
+  ports:
+  - name: flask
+    port: 30009
+    targetPort: 5000
+    nodePort: 30009
+  - name: prometheus
+    port: 30010
+    targetPort: 9090
+    nodePort: 30010
+  selector:
+    app: battery
