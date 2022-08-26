@@ -1,1 +1,1 @@
-docker run --name=battery-management-system --restart=unless-stopped --group-add=dialout --privileged=true --device=/dev/ttyUSB0 -p 30006:5000 -p 30007:9090 battery-management-system
+docker run --name=battery-management-system --restart=unless-stopped --group-add=dialout --privileged=true --device=/dev/ttyUSB0 -p 30006:5000 -p 30007:9090 -it -d battery-management-system
